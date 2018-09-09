@@ -239,6 +239,158 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://megatree.net/java-heap-bin-analyze.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangZ">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MeGaTrEE">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/java-heap-bin-analyze.html" itemprop="url">Java内存分析工具使用必知必会</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-06T08:23:40+08:00">
+                2018-09-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>一般来说，运用JDK提供的工具对应用程序进行分析，有两个主要方向：CPU爆满、内存泄露；前者可以考虑是不是发生线程死锁，后者可以根据工具分析结果，判断有没有，是哪个类的实例占满内存。</p>
+<h2 id="对于CPU满载的分析"><a href="#对于CPU满载的分析" class="headerlink" title="对于CPU满载的分析"></a>对于CPU满载的分析</h2><ol>
+<li><p>首先应当查看错误日志，寻找错误来源。</p>
+</li>
+<li><p>查询应用PID</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps aux |grep your-app |grep -v grep</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看该进程下，线程的资源占用情况</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">top -Hp 9527</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>进一步查看CPU使用率，找出异常线程，转换为16进制</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">printf "%x\n" 9528</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用<code>jstack</code> 查看线程信息</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jstack -l 9527 |grep 8a1</span><br></pre></td></tr></table></figure>
+<p>此时有可能显示如下：</p>
+<p><img src="https://raw.githubusercontent.com/megatree/imgbucket/master/20180910003344.png" alt=""></p>
+</li>
+</ol>
+<h2 id="对于内存泄露的分析"><a href="#对于内存泄露的分析" class="headerlink" title="对于内存泄露的分析"></a>对于内存泄露的分析</h2><ol>
+<li><p>假设我们的程序pid为 9527，首先使用<code>jamp</code> 查看有无异常实例</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jmap -histo:live 9527 |head -20</span><br></pre></td></tr></table></figure>
+<p>取前20行就够用。</p>
+<p><img src="https://raw.githubusercontent.com/megatree/imgbucket/master/20180910004053.png" alt=""></p>
+<p>其中，<code>[C</code> 表示<code>char[]</code> ，<code>[B</code> 表示<code>byte[]</code> ，<code>[L</code> 表示对象数组；由此观察每种class的实例数、占用内存大小，可以判定是否发生内存泄露。</p>
+</li>
+<li><p>除此以外，还有</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>显示java堆详细信息</span><br><span class="line">jmap -heap 9527</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>显示在F-Queue队列中等待Finalizer线程执行finalize()方法的对象</span><br><span class="line">jmap -finalizerinfo 9527</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>生成堆转储快照</span><br><span class="line">jmap -dump:live,format=b,file=~/xxx.bin 9527</span><br></pre></td></tr></table></figure>
+<p>堆转储快照文件可以下载到本机，使用JDK自带工具<code>jvisualVM</code> 来进行分析（相当于jmap和jstack）</p>
+<p>IDEA自带jvisualvm插件，可以在本机调试时唤起 jvisualvm工具，对应用程序进行监控，有助尽早发现问题。</p>
+</li>
+</ol>
+<p>以上。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://megatree.net/Apache-Kylin-必知必会.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -397,126 +549,6 @@
 </ul>
 </li>
 </ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://megatree.net/聚精会神搞建设，一心一意谋发展.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="wangZ">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MeGaTrEE">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/聚精会神搞建设，一心一意谋发展.html" itemprop="url">聚精会神搞建设，一心一意谋发展</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-12T18:20:49+08:00">
-                2018-08-12
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>突然蹦出这么两句，当做镇站之宝了</p>
 
           
         

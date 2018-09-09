@@ -79,19 +79,20 @@
 
 
 
-<meta name="description" content="引言 Apache Kylin 是 Hadoop 大数据平台上的一个开源 OLAP 引擎 核心思想是根据用户的数据模型和查询样式对数据进行预计算，并在查询时直接利用预计算结果返回查询结果。 工作原理是对数据模型做cube预计算，并利用计算的结果加速查询。 指定数据模型，定义维度和度量； 预计算cube，计算所有cuboid并保存为物化视图； 执行查询时，读取cuboid，运算，产生查询结果；">
+<meta name="description" content="一般来说，运用JDK提供的工具对应用程序进行分析，有两个主要方向：CPU爆满、内存泄露；前者可以考虑是不是发生线程死锁，后者可以根据工具分析结果，判断有没有，是哪个类的实例占满内存。 对于CPU满载的分析 首先应当查看错误日志，寻找错误来源。  查询应用PID 1ps aux |grep your-app |grep -v grep  查看该进程下，线程的资源占用情况 1top -Hp 9527">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Apache Kylin 必知必会">
-<meta property="og:url" content="https://megatree.net/Apache-Kylin-必知必会.html">
+<meta property="og:title" content="Java内存分析工具使用必知必会">
+<meta property="og:url" content="https://megatree.net/java-heap-bin-analyze.html">
 <meta property="og:site_name" content="MeGaTrEE">
-<meta property="og:description" content="引言 Apache Kylin 是 Hadoop 大数据平台上的一个开源 OLAP 引擎 核心思想是根据用户的数据模型和查询样式对数据进行预计算，并在查询时直接利用预计算结果返回查询结果。 工作原理是对数据模型做cube预计算，并利用计算的结果加速查询。 指定数据模型，定义维度和度量； 预计算cube，计算所有cuboid并保存为物化视图； 执行查询时，读取cuboid，运算，产生查询结果；">
+<meta property="og:description" content="一般来说，运用JDK提供的工具对应用程序进行分析，有两个主要方向：CPU爆满、内存泄露；前者可以考虑是不是发生线程死锁，后者可以根据工具分析结果，判断有没有，是哪个类的实例占满内存。 对于CPU满载的分析 首先应当查看错误日志，寻找错误来源。  查询应用PID 1ps aux |grep your-app |grep -v grep  查看该进程下，线程的资源占用情况 1top -Hp 9527">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://raw.githubusercontent.com/megatree/imgbucket/master/20180813230318.png">
-<meta property="og:updated_time" content="2018-08-13T15:05:45.877Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/megatree/imgbucket/master/20180910003344.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/megatree/imgbucket/master/20180910004053.png">
+<meta property="og:updated_time" content="2018-09-09T16:54:25.595Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Apache Kylin 必知必会">
-<meta name="twitter:description" content="引言 Apache Kylin 是 Hadoop 大数据平台上的一个开源 OLAP 引擎 核心思想是根据用户的数据模型和查询样式对数据进行预计算，并在查询时直接利用预计算结果返回查询结果。 工作原理是对数据模型做cube预计算，并利用计算的结果加速查询。 指定数据模型，定义维度和度量； 预计算cube，计算所有cuboid并保存为物化视图； 执行查询时，读取cuboid，运算，产生查询结果；">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/megatree/imgbucket/master/20180813230318.png">
+<meta name="twitter:title" content="Java内存分析工具使用必知必会">
+<meta name="twitter:description" content="一般来说，运用JDK提供的工具对应用程序进行分析，有两个主要方向：CPU爆满、内存泄露；前者可以考虑是不是发生线程死锁，后者可以根据工具分析结果，判断有没有，是哪个类的实例占满内存。 对于CPU满载的分析 首先应当查看错误日志，寻找错误来源。  查询应用PID 1ps aux |grep your-app |grep -v grep  查看该进程下，线程的资源占用情况 1top -Hp 9527">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/megatree/imgbucket/master/20180910003344.png">
 
 
 
@@ -121,13 +122,13 @@
 
 
 
-  <link rel="canonical" href="https://megatree.net/Apache-Kylin-必知必会.html"/>
+  <link rel="canonical" href="https://megatree.net/java-heap-bin-analyze.html"/>
 
 
 
 
 
-  <title>Apache Kylin 必知必会 | MeGaTrEE</title>
+  <title>Java内存分析工具使用必知必会 | MeGaTrEE</title>
   
 
 
@@ -244,7 +245,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://megatree.net/Apache-Kylin-必知必会.html">
+    <link itemprop="mainEntityOfPage" href="https://megatree.net/java-heap-bin-analyze.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="wangZ">
@@ -261,7 +262,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Apache Kylin 必知必会</h1>
+          <h1 class="post-title" itemprop="name headline">Java内存分析工具使用必知必会</h1>
         
 
         <div class="post-meta">
@@ -273,8 +274,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-13T00:54:10+08:00">
-                2018-08-13
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-06T08:23:40+08:00">
+                2018-09-06
               </time>
             
 
@@ -311,93 +312,39 @@
       
 
       
-        <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><ol>
-<li>Apache Kylin 是 Hadoop 大数据平台上的一个开源 OLAP 引擎</li>
-<li>核心思想是根据用户的数据模型和查询样式对数据进行预计算，并在查询时直接利用预计算结果返回查询结果。</li>
-<li>工作原理是对数据模型做cube预计算，并利用计算的结果加速查询。<ul>
-<li>指定数据模型，定义维度和度量；</li>
-<li>预计算cube，计算所有cuboid并保存为物化视图；</li>
-<li>执行查询时，读取cuboid，运算，产生查询结果；</li>
-</ul>
+        <p>一般来说，运用JDK提供的工具对应用程序进行分析，有两个主要方向：CPU爆满、内存泄露；前者可以考虑是不是发生线程死锁，后者可以根据工具分析结果，判断有没有，是哪个类的实例占满内存。</p>
+<h2 id="对于CPU满载的分析"><a href="#对于CPU满载的分析" class="headerlink" title="对于CPU满载的分析"></a>对于CPU满载的分析</h2><ol>
+<li><p>首先应当查看错误日志，寻找错误来源。</p>
 </li>
-<li>技术架构<ul>
-<li>分为在线查询和离线计算两部分  </li>
-</ul>
+<li><p>查询应用PID</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps aux |grep your-app |grep -v grep</span><br></pre></td></tr></table></figure>
 </li>
-</ol>
-<p><img src="https://raw.githubusercontent.com/megatree/imgbucket/master/20180813230318.png" alt="">  </p>
-<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><ol>
-<li>Table<ul>
-<li>表，是Cube数据源，通常来自Hive</li>
-</ul>
+<li><p>查看该进程下，线程的资源占用情况</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">top -Hp 9527</span><br></pre></td></tr></table></figure>
 </li>
-<li>Data Model <ul>
-<li>数据模型，定义由若干张表的一个连接关系。</li>
-<li>KAP支持星型模型，可以通过lookup关联多张表，可以配置filter过滤数据。</li>
-</ul>
+<li><p>进一步查看CPU使用率，找出异常线程，转换为16进制</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">printf "%x\n" 9528</span><br></pre></td></tr></table></figure>
 </li>
-<li>Cube<ul>
-<li>数据立方体，通过预计算，将计算结果存储在HBase里。</li>
-</ul>
-</li>
-<li>Partition<ul>
-<li>分区，以此将Cube 分成多个segment</li>
-</ul>
-</li>
-<li>Segment<ul>
-<li>分片，每个Segment是对特定时间范围的数据计算而成的cube，每个segment对应一张HBase表。</li>
-</ul>
-</li>
-<li>Aggregation Group<ul>
-<li>聚合组，可以将很多个维度分组，把经常一起使用的维度放在一起，有效降低Cube的组合数。</li>
-</ul>
+<li><p>使用<code>jstack</code> 查看线程信息</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jstack -l 9527 |grep 8a1</span><br></pre></td></tr></table></figure>
+<p>此时有可能显示如下：</p>
+<p><img src="https://raw.githubusercontent.com/megatree/imgbucket/master/20180910003344.png" alt=""></p>
 </li>
 </ol>
-<h3 id="维度-amp-度量"><a href="#维度-amp-度量" class="headerlink" title="维度&amp;度量"></a>维度&amp;度量</h3><ol>
-<li>Mandatory - 必需的维度<ul>
-<li>指那些总会出现在Where条件或Group By语句里的维度。通过将某个维度指定为Mandatory ，Kylin可以不用预计算不包含此维度的Cuboid，在构建cube时剪枝。</li>
-</ul>
+<h2 id="对于内存泄露的分析"><a href="#对于内存泄露的分析" class="headerlink" title="对于内存泄露的分析"></a>对于内存泄露的分析</h2><ol>
+<li><p>假设我们的程序pid为 9527，首先使用<code>jamp</code> 查看有无异常实例</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jmap -histo:live 9527 |head -20</span><br></pre></td></tr></table></figure>
+<p>取前20行就够用。</p>
+<p><img src="https://raw.githubusercontent.com/megatree/imgbucket/master/20180910004053.png" alt=""></p>
+<p>其中，<code>[C</code> 表示<code>char[]</code> ，<code>[B</code> 表示<code>byte[]</code> ，<code>[L</code> 表示对象数组；由此观察每种class的实例数、占用内存大小，可以判定是否发生内存泄露。</p>
 </li>
-<li>Hierarchy - 层级维度<ul>
-<li>是一组有层级（或包含）关系的维度，例如“国家”、“省”，在查询低级别维度时，往往会带上高级别维度的条件，而不会孤立的审视低级别维度的数据。例如A\B\C是层级，并且A&gt;B&gt;C，那么只需要计算A、AB、ABC，其他组合不做预计算。</li>
-</ul>
-</li>
-<li>Joint - 联合维度<ul>
-<li>是将多个维度组合成一个维度，比如group by 中总是一起出现的维度。</li>
-</ul>
-</li>
-<li>Derived - 衍生维度<ul>
-<li>在创建cube时指定demension时出现，Kylin会在底层记录维度表主键与维度表其他维度之间的映射关系，以便在查询时能够动态的将维度表的主键翻译成这些非主键维度，并进行实时聚合。</li>
-</ul>
-</li>
-<li>Kylin是以 key-value的方式将cube存储到HBase中。HBase的key即RowKey，是各维度的值拼接而成的。为了更高效的存储这些值，Kylin会对他们进行编码和缩：<ul>
-<li>默认采用 Dict 编码<br>  1) 将此维度下所有值构建成一个从string到int的映射表，cube中存储int，大大减小存储的大小。<br>  2) 如果基数很高，那么不适合加载到内存中，需要选择其他编码方式。（基数上限默认 500w）</li>
-<li>还有Int 整数 和 Fixed Length 编码</li>
-<li>RowKeys的顺序对查询性能有较明显的影响，通常将频率较高的列放在频率较低的列之前。</li>
-</ul>
+<li><p>除此以外，还有</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>显示java堆详细信息</span><br><span class="line">jmap -heap 9527</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>显示在F-Queue队列中等待Finalizer线程执行finalize()方法的对象</span><br><span class="line">jmap -finalizerinfo 9527</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>生成堆转储快照</span><br><span class="line">jmap -dump:live,format=b,file=~/xxx.bin 9527</span><br></pre></td></tr></table></figure>
+<p>堆转储快照文件可以下载到本机，使用JDK自带工具<code>jvisualVM</code> 来进行分析（相当于jmap和jstack）</p>
+<p>IDEA自带jvisualvm插件，可以在本机调试时唤起 jvisualvm工具，对应用程序进行监控，有助尽早发现问题。</p>
 </li>
 </ol>
-<h3 id="Cuboid-剪枝优化"><a href="#Cuboid-剪枝优化" class="headerlink" title="Cuboid 剪枝优化"></a>Cuboid 剪枝优化</h3><ol>
-<li>在没有采取任何优化措施的情况下，kylin会对每一种维度的组合进行预计算，计算结果成为cuboid。<ul>
-<li>假设有10个维度，最终会有2^10=1024个Cuboid需要计算</li>
-</ul>
-</li>
-<li>工具供用户检查cube中哪些cuboid最终被预计算了。</li>
-<li>当前cube大小/源数据大小 称为  膨胀率。<ul>
-<li>一般来说，膨胀率应该在0% ~ 1000% 之间。如果膨胀率过高，那么可能是<br>1) 维度数量较多，没有进行合理的剪枝优化<br>2) cube中存在较高基数的维度，导致包含这类维度的每一个cuboid占用空间很大<br>3) 存在占用空间的度量，比如 Count Distinct</li>
-</ul>
-</li>
-<li>优化途径<ul>
-<li>使用衍生维度 lookup table</li>
-<li>使用聚合组 Aggregation Group</li>
-<li>RowKeys 顺序</li>
-<li>维度编码 （Dict Int Fixed_length Date Time）</li>
-<li>分片 segment </li>
-<li>降低度量精度</li>
-<li>及时清理无用segment</li>
-</ul>
-</li>
-</ol>
+<p>以上。</p>
 
       
     </div>
@@ -422,15 +369,15 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/Apache-Kylin-必知必会.html" rel="next" title="Apache Kylin 必知必会">
+                <i class="fa fa-chevron-left"></i> Apache Kylin 必知必会
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/java-heap-bin-analyze.html" rel="prev" title="Java内存分析工具使用必知必会">
-                Java内存分析工具使用必知必会 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -548,7 +495,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#引言"><span class="nav-number">1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#概念"><span class="nav-number">2.</span> <span class="nav-text">概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#维度-amp-度量"><span class="nav-number">2.1.</span> <span class="nav-text">维度&amp;度量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cuboid-剪枝优化"><span class="nav-number">2.2.</span> <span class="nav-text">Cuboid 剪枝优化</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#对于CPU满载的分析"><span class="nav-number">1.</span> <span class="nav-text">对于CPU满载的分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对于内存泄露的分析"><span class="nav-number">2.</span> <span class="nav-text">对于内存泄露的分析</span></a></li></ol></div>
             
 
           </div>
